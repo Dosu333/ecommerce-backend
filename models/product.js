@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const Category = require('./category')
+const {Category} = require('./category')
 
 const productSchema = mongoose.Schema({
     name: {
