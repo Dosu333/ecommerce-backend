@@ -4,8 +4,6 @@ const app = express();
 const bodyParser = require('body-parser');
 const morgan = require('morgan')
 const mongoose = require('mongoose')
-const Product = require('./models/product')
-const productsRouter = require('./routers/product')
 
 // Environment variables
 require('dotenv/config');
@@ -17,6 +15,8 @@ app.use(bodyParser.json());
 app.use(morgan('tiny'))
 
 // Routers
+const productsRouter = require('./routers/product')
+
 app.use(`${api}/products`, productsRouter)
 
 mongoose.connect(connectionString, {
