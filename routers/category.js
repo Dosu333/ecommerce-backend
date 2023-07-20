@@ -2,6 +2,7 @@ const {Category} = require('../models/category');
 const express = require('express');
 const router = express.Router();
 
+// Category detail
 router.get('/', async (req, res) => {
     const categoryList = await Category.find()
     if (!categoryList) {
@@ -12,6 +13,7 @@ router.get('/', async (req, res) => {
     res.status(200).send(categoryList)
 })
 
+// Category detail
 router.get('/:id', async (req, res) => {
     const category = await Category.findById(req.params.id);
     if (!category) {
@@ -23,6 +25,7 @@ router.get('/:id', async (req, res) => {
     res.status(200).send(category)
 })
 
+// Create category
 router.post('/', async (req, res) => {
     let category = new Category({
         name: req.body.name,
@@ -41,6 +44,7 @@ router.post('/', async (req, res) => {
     res.status(201).json(createdCategory)
 });
 
+// Update category
 router.put('/:id', (req, res) => {
     Category.findByIdAndUpdate(req.params.id, {
         name: req.body.name,
@@ -65,6 +69,7 @@ router.put('/:id', (req, res) => {
     })
 })
 
+// Delete category
 router.delete('/:id', (req, res) => {
     Category.findByIdAndRemove(req.params.id)
     .then(category => {
