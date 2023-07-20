@@ -20,9 +20,11 @@ app.use(bodyParser.json());
 app.use(morgan('tiny'))
 
 // Routers
-const productsRouter = require('./routers/product')
+const productsRouter = require('./routers/product');
+const categoryRouter = require('./routers/category');
 
 app.use(`${api}/products`, productsRouter)
+app.use(`${api}/category`, categoryRouter)
 
 mongoose.connect(connectionString, {
     useNewUrlParser: true,
