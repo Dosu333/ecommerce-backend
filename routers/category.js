@@ -41,6 +41,30 @@ router.post('/', async (req, res) => {
     res.status(201).json(createdCategory)
 });
 
+router.put('/:id', (req, res) => {
+    Category.findByIdAndUpdate(req.params.id, {
+        name: req.body.name,
+        icon: req.body.icon,
+        color: req.body.color,
+        image: req.body.image,
+    }, {new: true})
+    .then(category => {
+        if (!category) {
+            res.status(404).json({
+                success: false,
+                error: 'Category with ID not found'
+            })
+        }
+        res.status(200).send(category)
+    })
+    .catch(err => {
+        res.status(500).json({
+            success: false,
+            error: err
+        })
+    })
+})
+
 router.delete('/:id', (req, res) => {
     Category.findByIdAndRemove(req.params.id)
     .then(category => {
