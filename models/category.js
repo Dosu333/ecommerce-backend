@@ -5,9 +5,18 @@ const categorySchema = mongoose.Schema({
         type: String,
         required: true
     },
-    color: String,
-    icon: String,
-    image: String
+    color: {
+        type: String,
+        default: ''
+    },
+    icon: {
+        type: String,
+        default: ''
+    },
+    image: {
+        type: String,
+        default: ''
+    }
 })
 
 exports.Category = mongoose.model('Category', categorySchema)
