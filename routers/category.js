@@ -9,7 +9,18 @@ router.get('/', async (req, res) => {
             success: false
         })
     }
-    res.status(200).json(categoryList)
+    res.status(200).send(categoryList)
+})
+
+router.get('/:id', async (req, res) => {
+    const category = await Category.findById(req.params.id);
+    if (!category) {
+        res.status(404).json({
+            success: false,
+            error: 'Category with given ID was not found',
+        })
+    }
+    res.status(200).send(category)
 })
 
 router.post('/', async (req, res) => {
@@ -50,4 +61,5 @@ router.delete('/:id', (req, res) => {
         })
     })
 })
+
 module.exports = router
