@@ -3,9 +3,15 @@ const express = require('express');
 const { Category } = require('../models/category');
 const router = express.Router();
 
-// Product list
+// Product list. Can be filtered by categories.
 router.get('/', async (req, res) => {
-    const productList = await Product.find().select('name image category -_id').populate('category');
+    let filter = {};
+
+    if (req.query.categories) {
+        filter = {category: req.query.categories.split(',')}
+    }
+
+    const productList = await Product.find(filter).select('name image category -_id').populate('category');
     if (!productList) {
         return res.status(500).json({
             success: false
@@ -122,6 +128,7 @@ router.delete('/:id', (req, res) => {
     })
 })
 
+// Get products count
 router.get('/get/count', async (req, res) => {
     const productCount = await Product.countDocuments();
     if (!productCount) {
@@ -134,6 +141,7 @@ router.get('/get/count', async (req, res) => {
     });
 })
 
+// Get featured products. Can specify the amount of products to be returned. 0 returns all products
 router.get('/get/featured/:count', async (req, res) => {
     const products = await Product.find({isFeatured: true}).limit(+req.params.count);
     if (!products) {
