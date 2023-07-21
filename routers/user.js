@@ -26,8 +26,42 @@ router.get('/:id', async (req, res) => {
     res.send(user);
 })
 
-// Create a user
+// Create a user for admin
 router.post('/', (req, res) => {
+    let user = new User({
+        name: req.body.name,
+        email: req.body.email,
+        passwordHash: bcrypt.hashSync(req.body.password, 10),
+        phone: req.body.phone,
+        street: req.body.street,
+        apartment: req.body.apartment,
+        city: req.body.city,
+        zip: req.body.zip,
+        country: req.body.country,
+        isAdmin: req.body.isAdmin
+    })
+
+    user.save()
+    .then(createdUser => {
+        if (!createdUser) {
+            return res.status(401).json({
+                success: false,
+                error:'User cannot be created'
+            })
+        }
+        res.status(201).json(createdUser)
+    })
+    .catch(err => {
+        res.status(500).json({
+            success: false,
+            error: err
+        })
+    })
+    
+});
+
+// Register new customer from storefront
+router.post('/register', (req, res) => {
     let user = new User({
         name: req.body.name,
         email: req.body.email,
