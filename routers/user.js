@@ -1,6 +1,7 @@
 const {User} = require('../models/user')
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const router = express.Router();
 
 // List users
@@ -58,5 +59,27 @@ router.post('/', (req, res) => {
     })
     
 });
+
+// User login
+router.post('/login', async (req, res) => {
+    const user = await User.findOne({email: req.body.email});
+    const secret = process.env.JWT_SECRET;
+
+    if (user && bcrypt.compareSync(req.body.password, user.passwordHash)) {
+        const token = jwt.sign(
+            {
+                userId: user.id
+            },
+            secret,
+            {expiresIn: '1d'}
+        )
+        return res.status(200).send({user: user.email, token:token});
+    } else {
+        return res.status(400).json({
+            success: false,
+            error: 'Invalid credentials'
+        })
+    }
+})
 
 module.exports = router
