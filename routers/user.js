@@ -102,7 +102,8 @@ router.post('/login', async (req, res) => {
     if (user && bcrypt.compareSync(req.body.password, user.passwordHash)) {
         const token = jwt.sign(
             {
-                userId: user.id
+                userId: user.id,
+                isAdmin: user.isAdmin
             },
             secret,
             {expiresIn: '1d'}
@@ -114,6 +115,41 @@ router.post('/login', async (req, res) => {
             error: 'Invalid credentials'
         })
     }
+})
+
+// Delete user
+router.delete('/:id', (req, res) => {
+    User.findByIdAndRemove(req.params.id)
+    .then(user => {
+        if (user) {
+            return res.status(200).json({
+                success: true
+            })
+        }
+        res.status(404).json({
+            success: false,
+            error: 'Product not found'
+        })
+    })
+    .catch(err => {
+        res.status(400).json({
+            success: false,
+            error: err
+        })
+    })
+})
+
+// Get user count
+router.get('/get/count', async (req, res) => {
+    const userCount = await User.countDocuments();
+    if (!userCount) {
+        return res.status(500).json({
+            success: false
+        })
+    }
+    res.send({
+        count: userCount
+    });
 })
 
 module.exports = router
