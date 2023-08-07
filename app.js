@@ -27,10 +27,12 @@ app.use(errorHandler);
 const productsRoutes = require('./routers/product');
 const categoryRoutes = require('./routers/category');
 const usersRoutes = require('./routers/user');
+const ordersRoutes = require('./routers/order');
 
 app.use(`${api}/products`, productsRoutes);
 app.use(`${api}/category`, categoryRoutes);
 app.use(`${api}/users`, usersRoutes);
+app.use(`${api}/order`, ordersRoutes);
 
 mongoose.connect(connectionString, {
     useNewUrlParser: true,
