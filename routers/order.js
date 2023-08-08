@@ -30,8 +30,9 @@ router.get('/:id', async (req, res) => {
     res.send(order);
 })
 
-// Create order
+// Create order endpoint
 router.post('/', async (req, res) => {
+    // Create orderItem
     const orderItemsIds = Promise.all(req.body.orderItems.map(async orderitem => {
         let newOrderItem = new OrderItem({
             quantity: orderitem.quantity,
@@ -43,8 +44,17 @@ router.post('/', async (req, res) => {
         return newOrderItem._id;
     }))
     const orderItemsIdsResolved = await orderItemsIds;
-    // console.log(orderItemsIdsResolved)
+    
+    // Calculate total price of order
+    const totalPrices = await Promise.all(orderItemsIdsResolved.map(async orderItemId => {
+        const orderItem = await OrderItem.findById(orderItemId).populate('product', 'price');
+        const totalPrice = orderItem.product.price * orderItem.quantity;
+        return totalPrice
+    }))
 
+    const totalPrice = totalPrices.reduce((a,b) => a + b, 0);
+
+    // Create Order
     let order = new Order({
         orderitems: orderItemsIdsResolved,
         shippingAddress1: req.body.shippingAddress1,
@@ -54,7 +64,7 @@ router.post('/', async (req, res) => {
         country: req.body.country,
         phone: req.body.phone,
         status: req.body.status,
-        totalPrice: req.body.totalPrice,
+        totalPrice: totalPrice,
         user: req.body.user
     })
 
@@ -68,7 +78,8 @@ router.post('/', async (req, res) => {
     res.status(201).json(createdOrder)
 });
 
-// Update order status
+
+// Update order status endpoint
 router.put('/:id', (req, res) => {
     Order.findByIdAndUpdate(req.params.id, {
         status: req.body.status
@@ -90,11 +101,15 @@ router.put('/:id', (req, res) => {
     })
 })
 
-// Delete order
+
+// Delete order endpoint
 router.delete('/:id', (req, res) => {
     Order.findByIdAndRemove(req.params.id)
-    .then(order => {
+    .then(async order => {
         if (order) {
+            await order.orderitems.map(async orderitem => {
+                await OrderItem.findByIdAndRemove(orderitem)
+            })
             return res.status(200).json({
                 success: true
             })
@@ -105,7 +120,7 @@ router.delete('/:id', (req, res) => {
         })
     })
     .catch(err => {
-        res.status(400).json({
+        res.status(500).json({
             success: false,
             error: err
         })
