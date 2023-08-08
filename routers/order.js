@@ -67,4 +67,48 @@ router.post('/', async (req, res) => {
     }
     res.status(201).json(createdOrder)
 });
+
+// Update order status
+router.put('/:id', (req, res) => {
+    Order.findByIdAndUpdate(req.params.id, {
+        status: req.body.status
+    }, {new: true})
+    .then(order => {
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                error: 'Order with ID not found'
+            })
+        }
+        res.status(200).send(order)
+    })
+    .catch(err => {
+        res.status(500).json({
+            success: false,
+            error: err
+        })
+    })
+})
+
+// Delete order
+router.delete('/:id', (req, res) => {
+    Order.findByIdAndRemove(req.params.id)
+    .then(order => {
+        if (order) {
+            return res.status(200).json({
+                success: true
+            })
+        }
+        return res.status(404).json({
+            success: false,
+            error: 'Order not found'
+        })
+    })
+    .catch(err => {
+        res.status(400).json({
+            success: false,
+            error: err
+        })
+    })
+})
 module.exports = router
