@@ -3,6 +3,7 @@ const express = require('express');
 const { OrderItem } = require('../models/orderitem');
 const router = express.Router();
 
+// Get order list
 router.get('/', async (req, res) => {
     const orderList = await Order.find().populate('user', 'name').sort({'dateOrdered': -1});
     if (!orderList) {
@@ -78,7 +79,6 @@ router.post('/', async (req, res) => {
     res.status(201).json(createdOrder)
 });
 
-
 // Update order status endpoint
 router.put('/:id', (req, res) => {
     Order.findByIdAndUpdate(req.params.id, {
@@ -100,7 +100,6 @@ router.put('/:id', (req, res) => {
         })
     })
 })
-
 
 // Delete order endpoint
 router.delete('/:id', (req, res) => {
@@ -127,7 +126,6 @@ router.delete('/:id', (req, res) => {
     })
 })
 
-
 // Get total Sales endpoint
 router.get('/get/totalsales', async (req, res) => {
     const totalSales = await Order.aggregate([
@@ -145,7 +143,6 @@ router.get('/get/totalsales', async (req, res) => {
     })
 })
 
-
 // Get orders count
 router.get('/get/count', async (req, res) => {
     const orderCount = await Order.countDocuments();
@@ -158,6 +155,25 @@ router.get('/get/count', async (req, res) => {
         success: true,
         count: orderCount
     });
+})
+
+// Get order list for a user
+router.get('/get/userorders/:userid', async (req, res) => {
+    const userOrderList = await Order.find({user: req.params.userid})
+    .populate({
+        path: 'orderitems',
+        populate: {
+            path: 'product',
+            populate: 'category'
+        }
+    }).sort({'dateOrdered': -1});
+
+    if (!userOrderList) {
+        res.status(500).json({
+            success: false
+        })
+    }
+    res.send(userOrderList);
 })
 
 module.exports = router
