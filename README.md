@@ -13,9 +13,6 @@ This is a backend implementation for an eCommerce platform built using Node.js a
   - [Installation](#installation)
 - [Configuration](#configuration)
 - [Usage](#usage)
-- [API Documentation](#api-documentation)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Features
 
